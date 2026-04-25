@@ -3,13 +3,23 @@
   "build": {
     "builder": "NIXPACKS",
     "nixpacksPlan": {
-      "providers": ["python"]
+      "providers": ["python"],
+      "phases": {
+        "setup": {
+          "nixPkgs": ["python312", "postgresql_16.dev", "gcc"]
+        },
+        "install": {
+          "cmds": [
+            "python -m venv --copies /opt/venv && . /opt/venv/bin/activate && pip install -r requirements.txt"
+          ]
+        }
+      }
     }
   },
   "deploy": {
-    "startCommand": "gunicorn shifo_radar.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --timeout 60 --access-logfile -",
+    "startCommand": "python manage.py migrate --noinput && python manage.py collectstatic --noinput && python manage.py seed && gunicorn shifo_radar.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --timeout 60 --access-logfile -",
     "healthcheckPath": "/api/v1/health/",
-    "healthcheckTimeout": 30,
+    "healthcheckTimeout": 60,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 5
   }
