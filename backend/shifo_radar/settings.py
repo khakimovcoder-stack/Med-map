@@ -22,6 +22,10 @@ _railway_domain = config("RAILWAY_PUBLIC_DOMAIN", default="")
 if _railway_domain and _railway_domain not in ALLOWED_HOSTS:
     ALLOWED_HOSTS = [*ALLOWED_HOSTS, _railway_domain]
 
+# Railway healthcheck probes use this Host header.
+if "healthcheck.railway.app" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS = [*ALLOWED_HOSTS, "healthcheck.railway.app"]
+
 CSRF_TRUSTED_ORIGINS = config(
     "CSRF_TRUSTED_ORIGINS",
     default="",
